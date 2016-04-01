@@ -11,6 +11,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.List;
+import java.util.Set;
+import org.eclipse.jetty.util.log.Log;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -21,40 +27,9 @@ import org.openqa.selenium.firefox.FirefoxProfile;
  */
 public class java {
     
-    public static void openFirefox(){
     
-    
-    
-    FirefoxProfile profile = new FirefoxProfile();
-    profile.setPreference("network.proxy.type", 1);
-    profile.setPreference("network.proxy.socks", "127.0.0.1");
-    profile.setPreference("network.proxy.socks_port", 9150);
-    FirefoxDriver Driver = new FirefoxDriver(profile);
-    
-    }
-    
-    public static void openTor(){
-    
-    File torProfileDir = new File(
-        "C:\\Users\\Carlos\\Desktop\\Tor Browser\\Browser\\TorBrowser\\Data\\Browser\\profile.default");
-FirefoxBinary binary = new FirefoxBinary(new File( 
-        "C:\\Users\\Carlos\\Desktop\\Tor Browser\\Start Tor Browser.exe"));
-       
-FirefoxProfile torProfile = new FirefoxProfile(torProfileDir);
-torProfile.setPreference("webdriver.load.strategy", "unstable");
 
-
-
-try {
-    binary.startProfile(torProfile, torProfileDir, "");
-} catch (IOException e) {
-    e.printStackTrace();
-}
-       
-
-    }
-    
-    private void killFirefox() {
+    public static void killFirefox() {
 Runtime rt = Runtime.getRuntime();
 
 try {
@@ -70,7 +45,7 @@ catch (Exception e) {
 }
 }
 
-private boolean processIsRunning(String process) {
+public static boolean processIsRunning(String process) {
 boolean firefoxIsRunning = false;
 String line;
 try {
@@ -93,31 +68,55 @@ try {
 
 return firefoxIsRunning;
 }
-    
-    
-    public static void main(String[] args){
-       try{ 
-        
-        TorClient tor = new TorClient();
-    
-   
-    tor.start();
-    tor.enableSocksListener();
-        
-       }catch(Exception e){
-       e.printStackTrace();
-       }
+
+
+public static void runTor() throws InterruptedException{
+
+       File torProfileDir = new File(
+        "C:\\Users\\Carlos\\Desktop\\Tor Browser\\Browser\\TorBrowser\\Data\\Browser\\profile.default");
+FirefoxBinary binary = new FirefoxBinary(new File( 
+        "C:\\Users\\Carlos\\Desktop\\Tor Browser\\Browser\\firefox.exe"));
        
+FirefoxProfile torProfile = new FirefoxProfile(torProfileDir);
+torProfile.setPreference("webdriver.load.strategy", "unstable");
+
+        
+
+    FirefoxProfile profile = new FirefoxProfile();
+    profile.setPreference("network.proxy.type", 1);
+    profile.setPreference("network.proxy.socks", "127.0.0.1");
+    profile.setPreference("network.proxy.socks_port", 9150);
+    FirefoxDriver Driver = new FirefoxDriver(profile);
     
    
-   
+
+try {
+    binary.startProfile(torProfile, torProfileDir, "");
+    Thread.sleep(10000);
+    Driver.get("http://www.ip-tracker.org/locator/ip-lookup.php");
     
+} catch (IOException e) {
+    e.printStackTrace();
+}
+
+
+}
+    
+    
+    public static void main(String[] args) throws InterruptedException{
+        
+        for (int i = 0; i < 3; i++) {
+            try{
+        runTor();
+        Thread.sleep(10000);
+        killFirefox();
+        }catch(Exception e ){
+            e.printStackTrace();
+        }}
+
     
     }
     
-    
-    
-    
-  
+
     
 }
